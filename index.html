@@ -36,6 +36,10 @@
     input, select, textarea { user-select: text; }
     .custom-scrollbar::-webkit-scrollbar { display: none; }
     .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Skrytie predvolenej šípky prehliadača pre details */
+    summary::-webkit-details-marker { display: none; }
+    summary { list-style: none; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans antialiased">
@@ -272,20 +276,14 @@
         { id: 'h1', name: 'Vypiť dostatok vody (3L)', color: '#3b82f6' },
         { id: 'h2', name: 'Išiel som spať na čas', color: '#8b5cf6' }
       ],
-      habitLogs: {
-        // "YYYY-MM-DD": ["h1", "h2"]
-      },
+      habitLogs: {},
       history: []
     };
 
-    // Load from LocalStorage & Migrate old structure if needed
     let appState = JSON.parse(localStorage.getItem('gymTrackState')) || defaultData;
-    if (!Array.isArray(appState.habits)) {
-      appState.habits = defaultData.habits;
-    }
-    if (!appState.habitLogs) {
-      appState.habitLogs = {};
-    }
+    if (!Array.isArray(appState.habits)) appState.habits = defaultData.habits;
+    if (!appState.habitLogs) appState.habitLogs = {};
+    if (!appState.history) appState.history = [];
 
     let activeRoutine = 'A';
     let calDisplayDate = new Date();
@@ -351,13 +349,7 @@
           isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
         }
 
-        let nextWeightText = '';
-        if (isCeilingMet) {
-          const nextW = ex.weight + ex.inc;
-          nextWeightText = `Cieľ splnený! Prihoď na ${nextW} kg`;
-        } else {
-          nextWeightText = `Nechaj ${ex.weight} kg`;
-        }
+        let nextWeightText = isCeilingMet ? `Cieľ splnený! Prihoď na ${ex.weight + ex.inc} kg` : `Nechaj ${ex.weight} kg`;
 
         let setInputsHTML = '';
         for (let s = 0; s < ex.sets; s++) {
@@ -425,6 +417,13 @@
 
     function finishWorkout() {
       const list = activeRoutine === 'A' ? appState.workoutA : appState.workoutB;
+      
+      const loggedExercises = list.map(e => ({
+        name: e.name,
+        weight: e.weight,
+        logs: [...e.logs]
+      }));
+
       list.forEach(ex => {
         let isCeilingMet = false;
         if (ex.type === 'Čas') {
@@ -441,7 +440,7 @@
       appState.history.unshift({
         date: todayStr,
         routine: activeRoutine,
-        details: list.map(e => `${e.name}: ${e.weight}kg (${e.logs.join('/')})`)
+        exercises: loggedExercises
       });
 
       saveState();
@@ -453,9 +452,7 @@
     // HABITS & STREAK LOGIC
     function toggleHabitToday(habitId) {
       const today = getTodayStr();
-      if (!appState.habitLogs[today]) {
-        appState.habitLogs[today] = [];
-      }
+      if (!appState.habitLogs[today]) appState.habitLogs[today] = [];
       const idx = appState.habitLogs[today].indexOf(habitId);
       if (idx > -1) {
         appState.habitLogs[today].splice(idx, 1);
@@ -469,23 +466,14 @@
     function calculateStreak(habitId) {
       let streak = 0;
       let checkDate = new Date();
-      
       const isCompleted = (dStr) => appState.habitLogs[dStr] && appState.habitLogs[dStr].includes(habitId);
 
-      // Check if completed today
       let todayStr = formatDate(checkDate);
-      let completedToday = isCompleted(todayStr);
-
-      if (!completedToday) {
-        // Check yesterday
+      if (!isCompleted(todayStr)) {
         checkDate.setDate(checkDate.getDate() - 1);
-        let yesterdayStr = formatDate(checkDate);
-        if (!isCompleted(yesterdayStr)) {
-          return 0; // streak is broken
-        }
+        if (!isCompleted(formatDate(checkDate))) return 0;
       }
 
-      // Count consecutive days backward
       while (true) {
         let dStr = formatDate(checkDate);
         if (isCompleted(dStr)) {
@@ -495,7 +483,6 @@
           break;
         }
       }
-
       return streak;
     }
 
@@ -556,7 +543,6 @@
     function renderCalendar() {
       const year = calDisplayDate.getFullYear();
       const month = calDisplayDate.getMonth();
-
       const monthNames = ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"];
       document.getElementById('calendar-month-title').innerText = `${monthNames[month]} ${year}`;
 
@@ -566,13 +552,11 @@
       const firstDayOfMonth = new Date(year, month, 1);
       const lastDayOfMonth = new Date(year, month + 1, 0);
       
-      // Calculate day of week offset (Monday = 0, Sunday = 6)
       let startingDay = firstDayOfMonth.getDay() - 1;
       if (startingDay === -1) startingDay = 6;
 
       const totalDays = lastDayOfMonth.getDate();
 
-      // Empty padding cells for start of month
       for (let i = 0; i < startingDay; i++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = "h-12 bg-slate-950/40 rounded-lg";
@@ -584,7 +568,6 @@
       for (let day = 1; day <= totalDays; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const doneHabitIds = appState.habitLogs[dateStr] || [];
-
         const isToday = (dateStr === todayStr);
 
         const cell = document.createElement('div');
@@ -666,20 +649,17 @@
       }
 
       if (editId) {
-        // Edit existing
         const habit = appState.habits.find(h => h.id === editId);
         if (habit) {
           habit.name = name;
           habit.color = selectedColorHex;
         }
       } else {
-        // Add new
-        const newHabit = {
+        appState.habits.push({
           id: 'h_' + Date.now(),
           name: name,
           color: selectedColorHex
-        };
-        appState.habits.push(newHabit);
+        });
       }
 
       saveState();
@@ -722,7 +702,7 @@
             <button onclick="editHabit('${h.id}')" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg">
               <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
             </button>
-            <button onclick="deleteHabit('${h.id}')" class="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg">
+            <button onclick="deleteHabit('${h.id}')" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-700 rounded-lg">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -732,88 +712,112 @@
       lucide.createIcons();
     }
 
-    // MODAL EXERCISE SETTINGS
+    // SETTINGS MODAL (EXERCISES)
     function openSettingsModal() {
       document.getElementById('modal-settings').classList.remove('hidden');
-      renderExerciseSettingsForms();
+      renderSettingsModal();
     }
 
     function closeSettingsModal() {
       document.getElementById('modal-settings').classList.add('hidden');
     }
 
-    function renderExerciseSettingsForms() {
+    function renderSettingsModal() {
       const containerA = document.getElementById('settings-exercises-a');
       const containerB = document.getElementById('settings-exercises-b');
-      containerA.innerHTML = '';
-      containerB.innerHTML = '';
+      
+      containerA.innerHTML = appState.workoutA.map((ex, i) => `
+        <div>
+          <input type="text" id="ex-a-${i}" value="${ex.name}" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+        </div>
+      `).join('');
 
-      appState.workoutA.forEach((ex, i) => {
-        containerA.appendChild(createExInputHTML('A', i, ex.name));
-      });
-
-      appState.workoutB.forEach((ex, i) => {
-        containerB.appendChild(createExInputHTML('B', i, ex.name));
-      });
-    }
-
-    function createExInputHTML(routine, index, currentName) {
-      const div = document.createElement('div');
-      div.className = "flex items-center gap-2";
-      div.innerHTML = `
-        <span class="w-5 text-slate-500 font-bold">${index + 1}.</span>
-        <input type="text" id="setting-ex-${routine}-${index}" value="${currentName}" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
-      `;
-      return div;
+      containerB.innerHTML = appState.workoutB.map((ex, i) => `
+        <div>
+          <input type="text" id="ex-b-${i}" value="${ex.name}" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+        </div>
+      `).join('');
     }
 
     function saveExerciseSettings() {
       appState.workoutA.forEach((ex, i) => {
-        const inp = document.getElementById(`setting-ex-A-${i}`);
-        if (inp && inp.value.trim()) ex.name = inp.value.trim();
+        const val = document.getElementById(`ex-a-${i}`).value.trim();
+        if (val) ex.name = val;
       });
-
       appState.workoutB.forEach((ex, i) => {
-        const inp = document.getElementById(`setting-ex-B-${i}`);
-        if (inp && inp.value.trim()) ex.name = inp.value.trim();
+        const val = document.getElementById(`ex-b-${i}`).value.trim();
+        if (val) ex.name = val;
       });
-
       saveState();
       closeSettingsModal();
       renderWorkout();
-      alert('Názvy cvikov boli úspešne aktualizované!');
+      alert('Názvy cvikov boli uložene.');
     }
 
-    // HISTORY
+    // HISTORY RENDER LOGIC WITH EXPANDABLE DETAILS
     function renderHistory() {
       const container = document.getElementById('history-list');
       container.innerHTML = '';
+
       if (!appState.history || appState.history.length === 0) {
-        container.innerHTML = '<p class="text-slate-500 italic">Zatiaľ nemáš žiadne uložené tréningy.</p>';
+        container.innerHTML = `<div class="p-4 text-center text-slate-500 text-xs">Zatiaľ žiadne odcvičené tréningy.</div>`;
         return;
       }
 
-      appState.history.forEach(item => {
-        const div = document.createElement('div');
-        div.className = "p-3 bg-slate-800/40 border border-slate-800 rounded-xl space-y-1";
-        div.innerHTML = `
-          <div class="flex justify-between items-center font-bold text-slate-200">
-            <span>Tréning ${item.routine}</span>
-            <span class="text-slate-400 text-[11px] font-normal">${item.date}</span>
-          </div>
-          <div class="text-[11px] text-slate-400 leading-relaxed">
-            ${item.details.join(' • ')}
-          </div>
+      appState.history.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden";
+
+        let exercisesListHTML = '';
+        if (item.exercises && Array.isArray(item.exercises)) {
+          exercisesListHTML = item.exercises.map(ex => 
+            `<div class="text-slate-300 text-xs py-0.5">${ex.name}: <span class="font-semibold text-blue-400">${ex.weight} kg</span> (${ex.logs.join(', ')})</div>`
+          ).join('');
+        } else if (item.details && Array.isArray(item.details)) {
+          exercisesListHTML = item.details.map(d => 
+            `<div class="text-slate-300 text-xs py-0.5">${d}</div>`
+          ).join('');
+        }
+
+        card.innerHTML = `
+          <details class="group">
+            <summary class="flex items-center justify-between p-3 cursor-pointer select-none hover:bg-slate-800/60 transition">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm">Tréning ${item.routine}</span>
+                <span class="text-xs text-slate-400 font-medium">${item.date}</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"></i>
+              </div>
+              <button onclick="deleteHistoryItem(event, ${index})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Vymazať z histórie">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </summary>
+            <div class="px-3 pb-3 pt-2 border-t border-slate-700/40 space-y-1 bg-slate-900/40">
+              ${exercisesListHTML}
+            </div>
+          </details>
         `;
-        container.appendChild(div);
+        container.appendChild(card);
       });
+
+      lucide.createIcons();
     }
 
+    function deleteHistoryItem(e, index) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (confirm('Chceš vymazať tento tréning z histórie?')) {
+        appState.history.splice(index, 1);
+        saveState();
+        renderHistory();
+      }
+    }
+
+    // EXPORT DATA
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `gym_track_backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `gymtrack_backup_${getTodayStr()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
