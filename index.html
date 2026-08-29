@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gym & Habit Tracker</title>
+  <title>Gym Tracker</title>
   
   <!-- iOS PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#0f172a">
   
   <!-- Manifest inline -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Gym %26 Habit Tracker","short_name":"GymTrack","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/2964/2964514.png","sizes":"512x512","type":"image/png"}]}'>
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Gym Tracker","short_name":"GymTrack","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/2964/2964514.png","sizes":"512x512","type":"image/png"}]}'>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -51,7 +51,7 @@
         <i data-lucide="dumbbell" class="w-5 h-5"></i>
       </div>
       <div>
-        <h1 class="font-bold text-base leading-tight">Gym & Habit Tracker</h1>
+        <h1 class="font-bold text-base leading-tight">Gym Tracker</h1>
         <p class="text-xs text-slate-400" id="current-date-display"></p>
       </div>
     </div>
@@ -69,12 +69,9 @@
   <main class="max-w-md mx-auto p-4 space-y-6">
 
     <!-- Navigation Tabs -->
-    <div class="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+    <div class="grid grid-cols-2 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
       <button onclick="switchTab('workout')" id="tab-btn-workout" class="py-2 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow">
         Tréning
-      </button>
-      <button onclick="switchTab('habits')" id="tab-btn-habits" class="py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white">
-        Návyky
       </button>
       <button onclick="switchTab('history')" id="tab-btn-history" class="py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white">
         História
@@ -103,56 +100,7 @@
       </button>
     </section>
 
-    <!-- TAB 2: HABITS -->
-    <section id="tab-habits" class="space-y-6 hidden">
-      <!-- Habits Header & Add Button -->
-      <div class="flex justify-between items-center">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i data-lucide="check-square" class="w-5 h-5 text-blue-400"></i> Dnešné Návyky
-        </h2>
-        <button onclick="openAddHabitModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow">
-          <i data-lucide="plus" class="w-4 h-4"></i> Spravovať návyky
-        </button>
-      </div>
-
-      <!-- Habits Today List -->
-      <div id="habits-today-list" class="space-y-3">
-        <!-- Injected via JS -->
-      </div>
-
-      <!-- Calendar & Streaks Overview -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <button onclick="changeMonth(-1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300">
-            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          </button>
-          <h3 class="font-bold text-sm text-slate-100" id="calendar-month-title">August 2026</h3>
-          <button onclick="changeMonth(1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300">
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <!-- Days Headers -->
-        <div class="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-          <span>Po</span><span>Ut</span><span>St</span><span>Št</span><span>Pi</span><span>So</span><span>Ne</span>
-        </div>
-
-        <!-- Calendar Grid -->
-        <div id="calendar-grid" class="grid grid-cols-7 gap-1">
-          <!-- Injected via JS -->
-        </div>
-
-        <!-- Legend / Active Habits Colors -->
-        <div class="pt-2 border-t border-slate-800/80">
-          <p class="text-[11px] font-semibold text-slate-400 mb-2">Legenda návykov:</p>
-          <div id="habits-legend-list" class="flex flex-wrap gap-2 text-xs">
-            <!-- Injected via JS -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: HISTORY -->
+    <!-- TAB 2: HISTORY -->
     <section id="tab-history" class="space-y-4 hidden">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
         <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2">
@@ -165,7 +113,7 @@
     </section>
   </main>
 
-  <!-- MODAL: SETTINGS (Edit Exercises) -->
+  <!-- MODAL: SETTINGS (Edit Exercises & Weight Increments) -->
   <div id="modal-settings" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center">
@@ -179,139 +127,83 @@
       <div class="p-4 overflow-y-auto space-y-6 custom-scrollbar text-xs">
         <div>
           <h4 class="font-bold text-blue-400 text-sm mb-3">Tréning A</h4>
-          <div id="settings-exercises-a" class="space-y-2"></div>
+          <div id="settings-exercises-a" class="space-y-3"></div>
         </div>
         <div>
           <h4 class="font-bold text-blue-400 text-sm mb-3">Tréning B</h4>
-          <div id="settings-exercises-b" class="space-y-2"></div>
+          <div id="settings-exercises-b" class="space-y-3"></div>
         </div>
       </div>
       <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex gap-2">
         <button onclick="saveExerciseSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl text-white text-xs shadow">
-          Uložiť Názvy Cvikov
+          Uložiť Nastavenia
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: HABIT MANAGEMENT -->
-  <div id="modal-habits" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-        <h3 class="font-bold text-base text-white flex items-center gap-2">
-          <i data-lucide="edit-3" class="w-5 h-5 text-blue-400"></i> Spravovať Návyky
-        </h3>
-        <button onclick="closeAddHabitModal()" class="text-slate-400 hover:text-white p-1">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <div class="p-4 overflow-y-auto space-y-5 custom-scrollbar text-xs">
-        <!-- New Habit Form -->
-        <div class="bg-slate-800/50 p-3 border border-slate-700/60 rounded-xl space-y-3">
-          <h4 class="font-bold text-white text-xs" id="habit-form-title">Pridať Nový Návyk</h4>
-          <input type="hidden" id="habit-edit-id" value="">
-          <div>
-            <label class="block text-slate-400 mb-1">Názov návyku:</label>
-            <input type="text" id="habit-input-name" placeholder="napr. Vypiť 3L vody" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Farba návyku:</label>
-            <div class="flex items-center gap-2" id="color-picker-container">
-              <!-- Preset color dots -->
-            </div>
-          </div>
-          <button onclick="saveHabit()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 font-bold rounded-lg text-white text-xs">
-            Uložiť Návyk
-          </button>
-        </div>
-
-        <!-- Existing Habits List -->
-        <div class="space-y-2">
-          <h4 class="font-bold text-slate-300 text-xs">Existujúce Návyky</h4>
-          <div id="habit-manage-list" class="space-y-2">
-            <!-- Injected via JS -->
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Colors preset palette
-    const COLOR_PALETTE = [
-      { name: 'Modrá', hex: '#3b82f6' },
-      { name: 'Zelená', hex: '#10b981' },
-      { name: 'Fialová', hex: '#8b5cf6' },
-      { name: 'Oranžová', hex: '#f59e0b' },
-      { name: 'Červená', hex: '#f43f5e' },
-      { name: 'Tyrkysová', hex: '#06b6d4' }
-    ];
-
-    let selectedColorHex = COLOR_PALETTE[0].hex;
-
     // Default Initial Data
     const defaultData = {
       workoutA: [
-        { id: 'a1', name: 'Hack squat / leg press', type: 'Veľký', sets: 2, minReps: 5, targetReps: 6, weight: 70, inc: 2.5, logs: [6, 6] },
-        { id: 'a2', name: 'Romanian deadlift', type: 'Veľký', sets: 2, minReps: 5, targetReps: 8, weight: 90, inc: 2.5, logs: [8, 8] },
-        { id: 'a3', name: 'Smith machine chest press 90 / dips', type: 'Veľký', sets: 2, minReps: 5, targetReps: 8, weight: 27, inc: 2.5, logs: [8, 8] },
-        { id: 'a4', name: 'Weighted pull-up / Lat pulldown', type: 'Veľký', sets: 2, minReps: 5, targetReps: 8, weight: 0, inc: 2.5, logs: [6, 6] },
-        { id: 'a5', name: 'Peck deck', type: 'Veľký', sets: 2, minReps: 5, targetReps: 8, weight: 80, inc: 2.5, logs: [8, 8] },
-        { id: 'a6', name: 'Biceps curl (cable / incline)', type: 'Malý', sets: 2, minReps: 6, targetReps: 10, weight: 55, inc: 1.5, logs: [10, 10] },
-        { id: 'a7', name: 'Back extension', type: 'Čas', sets: 1, minReps: 0, targetReps: 100, weight: 0, inc: 1.5, logs: [60] },
-        { id: 'a8', name: 'Ab crunch', type: 'Malý', sets: 2, minReps: 12, targetReps: 12, weight: 47, inc: 1.5, logs: [12, 12] }
+        { id: 'a1', name: 'Hack squat / leg press', sets: 2, targetReps: 6, weight: 70, inc: 2.5, logs: [6, 6] },
+        { id: 'a2', name: 'Romanian deadlift', sets: 2, targetReps: 8, weight: 90, inc: 2.5, logs: [8, 8] },
+        { id: 'a3', name: 'Smith machine chest press 90 / dips', sets: 2, targetReps: 8, weight: 27, inc: 2.5, logs: [8, 8] },
+        { id: 'a4', name: 'Weighted pull-up / Lat pulldown', sets: 2, targetReps: 8, weight: 0, inc: 2.5, logs: [6, 6] },
+        { id: 'a5', name: 'Peck deck', sets: 2, targetReps: 8, weight: 80, inc: 2.5, logs: [8, 8] },
+        { id: 'a6', name: 'Biceps curl (cable / incline)', sets: 2, targetReps: 10, weight: 55, inc: 2.5, logs: [10, 10] },
+        { id: 'a7', name: 'Back extension', sets: 1, targetReps: 100, weight: 0, inc: 2.5, logs: [60] },
+        { id: 'a8', name: 'Ab crunch', sets: 2, targetReps: 12, weight: 47, inc: 2.5, logs: [12, 12] }
       ],
       workoutB: [
-        { id: 'b1', name: 'Leg extension one leg', type: 'Veľký', sets: 2, minReps: 8, targetReps: 12, weight: 59, inc: 2.5, logs: [12, 12] },
-        { id: 'b2', name: 'Chest-supported row / T-bar row', type: 'Veľký', sets: 3, minReps: 6, targetReps: 10, weight: 60, inc: 2.5, logs: [10, 10, 10] },
-        { id: 'b3', name: 'Smith shoulder press', type: 'Veľký', sets: 2, minReps: 5, targetReps: 8, weight: 80, inc: 2.5, logs: [8, 8] },
-        { id: 'b4', name: 'Seated leg curl', type: 'Veľký', sets: 2, minReps: 8, targetReps: 12, weight: 66, inc: 2.5, logs: [12, 12] },
-        { id: 'b5', name: 'Seated good morning', type: 'Veľký', sets: 2, minReps: 8, targetReps: 12, weight: 25, inc: 2.5, logs: [12, 12] },
-        { id: 'b6', name: 'Overhead triceps extension / 1 arm extension', type: 'Malý', sets: 2, minReps: 6, targetReps: 10, weight: 17, inc: 1.5, logs: [10, 10] },
-        { id: 'b7', name: 'Lateral raise', type: 'Malý', sets: 1, minReps: 10, targetReps: 15, weight: 8, inc: 1.5, logs: [15] },
-        { id: 'b8', name: 'Ab crunch', type: 'Malý', sets: 2, minReps: 12, targetReps: 12, weight: 12.5, inc: 1.5, logs: [12, 12] }
+        { id: 'b1', name: 'Leg extension one leg', sets: 2, targetReps: 12, weight: 59, inc: 2.5, logs: [12, 12] },
+        { id: 'b2', name: 'Chest-supported row / T-bar row', sets: 2, targetReps: 10, weight: 60, inc: 2.5, logs: [10, 10] },
+        { id: 'b3', name: 'Smith shoulder press', sets: 2, targetReps: 8, weight: 80, inc: 2.5, logs: [8, 8] },
+        { id: 'b4', name: 'Seated leg curl', sets: 2, targetReps: 12, weight: 66, inc: 2.5, logs: [12, 12] },
+        { id: 'b5', name: 'Seated good morning', sets: 2, targetReps: 12, weight: 25, inc: 2.5, logs: [12, 12] },
+        { id: 'b6', name: 'Overhead triceps extension / 1 arm extension', sets: 2, targetReps: 10, weight: 17, inc: 2.5, logs: [10, 10] },
+        { id: 'b7', name: 'Lateral raise', sets: 2, targetReps: 15, weight: 8, inc: 2.5, logs: [15, 15] },
+        { id: 'b8', name: 'Ab crunch', sets: 2, targetReps: 12, weight: 12.5, inc: 2.5, logs: [12, 12] }
       ],
-      habits: [
-        { id: 'h1', name: 'Vypiť dostatok vody (3L)', color: '#3b82f6' },
-        { id: 'h2', name: 'Išiel som spať na čas', color: '#8b5cf6' }
-      ],
-      habitLogs: {},
       history: []
     };
 
     let appState = JSON.parse(localStorage.getItem('gymTrackState')) || defaultData;
-    if (!Array.isArray(appState.habits)) appState.habits = defaultData.habits;
-    if (!appState.habitLogs) appState.habitLogs = {};
     if (!appState.history) appState.history = [];
 
+    // Auto-fix/migration for old local data structure
+    ['workoutA', 'workoutB'].forEach(key => {
+      if (appState[key]) {
+        appState[key].forEach(ex => {
+          if (ex.inc === undefined) ex.inc = 2.5;
+          if (ex.name.toLowerCase().includes('chest-supported row') && ex.sets === 3) {
+            ex.sets = 2;
+            ex.logs = ex.logs.slice(0, 2);
+          }
+          if (ex.name.toLowerCase().includes('lateral raise') && ex.sets === 1) {
+            ex.sets = 2;
+            if (ex.logs.length < 2) ex.logs.push(ex.logs[0] || 15);
+          }
+        });
+      }
+    });
+
     let activeRoutine = 'A';
-    let calDisplayDate = new Date();
 
     function saveState() {
       localStorage.setItem('gymTrackState', JSON.stringify(appState));
     }
 
-    function getTodayStr() {
-      const d = new Date();
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('sk-SK', { weekday: 'short', month: 'short', day: 'numeric' });
       renderWorkout();
-      renderHabitsTab();
       renderHistory();
-      renderColorPicker();
       lucide.createIcons();
     });
 
     // NAVIGATION TABS
     function switchTab(tab) {
-      ['workout', 'habits', 'history'].forEach(t => {
+      ['workout', 'history'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
         btn.className = "py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
@@ -336,20 +228,34 @@
       renderWorkout();
     }
 
+    // Calculate how many times this exercise was performed with current weight in history
+    function getWeightOccurrenceCount(exName, currentWeight) {
+      let count = 0;
+      for (const item of appState.history) {
+        if (!item.exercises) continue;
+        const found = item.exercises.find(e => e.name === exName);
+        if (found) {
+          if (found.weight === currentWeight) {
+            count++;
+          } else {
+            break; // Stop when weight was different
+          }
+        }
+      }
+      return count;
+    }
+
     function renderWorkout() {
       const list = activeRoutine === 'A' ? appState.workoutA : appState.workoutB;
       const container = document.getElementById('workout-exercises-container');
       container.innerHTML = '';
 
       list.forEach((ex, exIdx) => {
-        let isCeilingMet = false;
-        if (ex.type === 'Čas') {
-          isCeilingMet = ex.logs[0] >= ex.targetReps;
-        } else {
-          isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
-        }
-
-        let nextWeightText = isCeilingMet ? `Cieľ splnený! Prihoď na ${ex.weight + ex.inc} kg` : `Nechaj ${ex.weight} kg`;
+        let isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
+        let incVal = ex.inc !== undefined ? ex.inc : 2.5;
+        let nextWeightText = isCeilingMet ? `Cieľ splnený! Prihoď na ${ex.weight + incVal} kg` : `Nechaj ${ex.weight} kg`;
+        
+        let weightCount = getWeightOccurrenceCount(ex.name, ex.weight);
 
         let setInputsHTML = '';
         for (let s = 0; s < ex.sets; s++) {
@@ -367,32 +273,40 @@
         const card = document.createElement('div');
         card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
         card.innerHTML = `
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded ${ex.type === 'Veľký' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : ex.type === 'Malý' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'}">
-                  ${ex.type}
-                </span>
-                <span class="text-xs text-slate-400">${ex.sets} séria / cieľ ${ex.targetReps}${ex.type === 'Čas' ? 's' : ' op.'}</span>
-              </div>
-              <h3 class="font-bold text-sm text-slate-100 mt-1">${ex.name}</h3>
+          <!-- Name Top, Weight Controls Right -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-0.5">
+              <h3 class="font-bold text-base text-slate-100 leading-snug">${ex.name}</h3>
+              <p class="text-xs text-slate-400 font-medium">Cieľ: ${ex.targetReps}${ex.name.toLowerCase().includes('back extension') ? 's' : ' op.'}</p>
             </div>
-            <div class="text-right">
-              <div class="flex items-center justify-end gap-1">
-                <button onclick="changeWeight('${activeRoutine}', ${exIdx}, -2.5)" class="text-slate-400 hover:text-white px-1 font-bold text-xs">-</button>
-                <span class="text-base font-extrabold text-blue-400">${ex.weight} kg</span>
-                <button onclick="changeWeight('${activeRoutine}', ${exIdx}, 2.5)" class="text-slate-400 hover:text-white px-1 font-bold text-xs">+</button>
+            
+            <!-- Weight Controls with Editable Input -->
+            <div class="shrink-0 flex items-center gap-1">
+              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, -1)" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700">-</button>
+              <div class="flex items-center gap-0.5">
+                <input type="number" step="any" value="${ex.weight}" onchange="updateWeightDirect('${activeRoutine}', ${exIdx}, this.value)" class="w-14 bg-slate-800 text-center font-extrabold text-blue-400 border border-slate-700 rounded-lg py-1 text-sm focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                <span class="text-xs text-slate-400 font-bold">kg</span>
               </div>
+              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, 1)" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700">+</button>
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-1 border-t border-slate-800/80">
+          <!-- Series Reps Row -->
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
             ${setInputsHTML}
           </div>
 
-          <div class="mt-2 text-[11px] p-2 rounded-xl flex items-center gap-2 ${isCeilingMet ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40' : 'bg-slate-800/40 text-slate-400'}">
-            <i data-lucide="${isCeilingMet ? 'trending-up' : 'minus'}" class="w-4 h-4 shrink-0"></i>
-            <span>${nextWeightText}</span>
+          <!-- Bottom Status Row: Left Counter, Right Recommendation -->
+          <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between gap-2 text-[11px]">
+            <div class="flex items-center gap-1.5 text-slate-400 bg-slate-800/40 px-2 py-1 rounded-lg border border-slate-700/40">
+              <i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i>
+              <span>Odcvičené: <strong class="text-slate-200 font-bold">${weightCount}x</strong></span>
+            </div>
+
+            <div class="flex items-center gap-1.5 ${isCeilingMet ? 'text-emerald-400 bg-emerald-950/40 border border-emerald-800/40' : 'text-slate-400 bg-slate-800/30'} px-2 py-1 rounded-lg">
+              <i data-lucide="${isCeilingMet ? 'trending-up' : 'minus'}" class="w-3.5 h-3.5 shrink-0"></i>
+              <span>${nextWeightText}</span>
+            </div>
           </div>
         `;
         container.appendChild(card);
@@ -408,11 +322,23 @@
       renderWorkout();
     }
 
-    function changeWeight(routine, exIdx, delta) {
+    function changeWeight(routine, exIdx, direction) {
       const list = routine === 'A' ? appState.workoutA : appState.workoutB;
-      list[exIdx].weight = Math.max(0, list[exIdx].weight + delta);
+      const inc = list[exIdx].inc !== undefined ? list[exIdx].inc : 2.5;
+      const amount = direction > 0 ? inc : -inc;
+      list[exIdx].weight = Math.max(0, Math.round((list[exIdx].weight + amount) * 100) / 100);
       saveState();
       renderWorkout();
+    }
+
+    function updateWeightDirect(routine, exIdx, val) {
+      const list = routine === 'A' ? appState.workoutA : appState.workoutB;
+      const num = parseFloat(val);
+      if (!isNaN(num) && num >= 0) {
+        list[exIdx].weight = num;
+        saveState();
+        renderWorkout();
+      }
     }
 
     function finishWorkout() {
@@ -425,14 +351,10 @@
       }));
 
       list.forEach(ex => {
-        let isCeilingMet = false;
-        if (ex.type === 'Čas') {
-          isCeilingMet = ex.logs[0] >= ex.targetReps;
-        } else {
-          isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
-        }
+        let isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
         if (isCeilingMet) {
-          ex.weight = ex.weight + ex.inc;
+          const inc = ex.inc !== undefined ? ex.inc : 2.5;
+          ex.weight = ex.weight + inc;
         }
       });
 
@@ -449,270 +371,7 @@
       renderHistory();
     }
 
-    // HABITS & STREAK LOGIC
-    function toggleHabitToday(habitId) {
-      const today = getTodayStr();
-      if (!appState.habitLogs[today]) appState.habitLogs[today] = [];
-      const idx = appState.habitLogs[today].indexOf(habitId);
-      if (idx > -1) {
-        appState.habitLogs[today].splice(idx, 1);
-      } else {
-        appState.habitLogs[today].push(habitId);
-      }
-      saveState();
-      renderHabitsTab();
-    }
-
-    function calculateStreak(habitId) {
-      let streak = 0;
-      let checkDate = new Date();
-      const isCompleted = (dStr) => appState.habitLogs[dStr] && appState.habitLogs[dStr].includes(habitId);
-
-      let todayStr = formatDate(checkDate);
-      if (!isCompleted(todayStr)) {
-        checkDate.setDate(checkDate.getDate() - 1);
-        if (!isCompleted(formatDate(checkDate))) return 0;
-      }
-
-      while (true) {
-        let dStr = formatDate(checkDate);
-        if (isCompleted(dStr)) {
-          streak++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-      return streak;
-    }
-
-    function formatDate(d) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    function renderHabitsTab() {
-      const today = getTodayStr();
-      const todayDone = appState.habitLogs[today] || [];
-      const container = document.getElementById('habits-today-list');
-      container.innerHTML = '';
-
-      if (appState.habits.length === 0) {
-        container.innerHTML = `<div class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-center text-xs text-slate-500">Nemáš žiadne aktívne návyky. Klikni na "Spravovať návyky" vyššie.</div>`;
-      } else {
-        appState.habits.forEach(h => {
-          const isDone = todayDone.includes(h.id);
-          const streak = calculateStreak(h.id);
-
-          const card = document.createElement('div');
-          card.className = `p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${isDone ? 'bg-slate-900 border-slate-700' : 'bg-slate-900/60 border-slate-800'}`;
-          card.onclick = () => toggleHabitToday(h.id);
-
-          card.innerHTML = `
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-lg flex items-center justify-center transition-all ${isDone ? 'text-white' : 'border border-slate-700'}" style="background-color: ${isDone ? h.color : 'transparent'}">
-                ${isDone ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
-              </div>
-              <div>
-                <h4 class="font-bold text-sm text-slate-100">${h.name}</h4>
-                <div class="flex items-center gap-1 text-[11px] text-amber-400 font-semibold mt-0.5">
-                  <i data-lucide="flame" class="w-3.5 h-3.5 fill-amber-400"></i>
-                  <span>${streak} dňový streak</span>
-                </div>
-              </div>
-            </div>
-            <div class="w-3 h-3 rounded-full" style="background-color: ${h.color}"></div>
-          `;
-          container.appendChild(card);
-        });
-      }
-
-      renderCalendar();
-      renderLegend();
-      lucide.createIcons();
-    }
-
-    // CALENDAR VIEW LOGIC
-    function changeMonth(delta) {
-      calDisplayDate.setMonth(calDisplayDate.getMonth() + delta);
-      renderCalendar();
-    }
-
-    function renderCalendar() {
-      const year = calDisplayDate.getFullYear();
-      const month = calDisplayDate.getMonth();
-      const monthNames = ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"];
-      document.getElementById('calendar-month-title').innerText = `${monthNames[month]} ${year}`;
-
-      const grid = document.getElementById('calendar-grid');
-      grid.innerHTML = '';
-
-      const firstDayOfMonth = new Date(year, month, 1);
-      const lastDayOfMonth = new Date(year, month + 1, 0);
-      
-      let startingDay = firstDayOfMonth.getDay() - 1;
-      if (startingDay === -1) startingDay = 6;
-
-      const totalDays = lastDayOfMonth.getDate();
-
-      for (let i = 0; i < startingDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = "h-12 bg-slate-950/40 rounded-lg";
-        grid.appendChild(emptyCell);
-      }
-
-      const todayStr = getTodayStr();
-
-      for (let day = 1; day <= totalDays; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const doneHabitIds = appState.habitLogs[dateStr] || [];
-        const isToday = (dateStr === todayStr);
-
-        const cell = document.createElement('div');
-        cell.className = `h-12 p-1 bg-slate-800/40 border ${isToday ? 'border-blue-500 bg-blue-950/20' : 'border-slate-800/60'} rounded-lg flex flex-col justify-between`;
-
-        let stripsHTML = '<div class="space-y-0.5 overflow-hidden max-h-6">';
-        doneHabitIds.forEach(hId => {
-          const habit = appState.habits.find(h => h.id === hId);
-          if (habit) {
-            stripsHTML += `<div class="h-1 rounded-full w-full" style="background-color: ${habit.color}"></div>`;
-          }
-        });
-        stripsHTML += '</div>';
-
-        cell.innerHTML = `
-          <span class="text-[10px] font-bold ${isToday ? 'text-blue-400' : 'text-slate-400'}">${day}</span>
-          ${stripsHTML}
-        `;
-        grid.appendChild(cell);
-      }
-    }
-
-    function renderLegend() {
-      const container = document.getElementById('habits-legend-list');
-      container.innerHTML = '';
-      appState.habits.forEach(h => {
-        const item = document.createElement('div');
-        item.className = "flex items-center gap-1.5 bg-slate-800/60 px-2 py-1 rounded-lg text-slate-300";
-        item.innerHTML = `
-          <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${h.color}"></div>
-          <span class="truncate max-w-[120px]">${h.name}</span>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    // MODAL HABIT MANAGEMENT
-    function renderColorPicker() {
-      const container = document.getElementById('color-picker-container');
-      container.innerHTML = '';
-      COLOR_PALETTE.forEach(c => {
-        const dot = document.createElement('button');
-        dot.type = "button";
-        dot.className = `w-7 h-7 rounded-full transition-transform border-2 ${selectedColorHex === c.hex ? 'scale-110 border-white' : 'border-transparent'}`;
-        dot.style.backgroundColor = c.hex;
-        dot.onclick = () => {
-          selectedColorHex = c.hex;
-          renderColorPicker();
-        };
-        container.appendChild(dot);
-      });
-    }
-
-    function openAddHabitModal() {
-      document.getElementById('modal-habits').classList.remove('hidden');
-      resetHabitForm();
-      renderHabitsManageList();
-    }
-
-    function closeAddHabitModal() {
-      document.getElementById('modal-habits').classList.add('hidden');
-    }
-
-    function resetHabitForm() {
-      document.getElementById('habit-edit-id').value = '';
-      document.getElementById('habit-input-name').value = '';
-      document.getElementById('habit-form-title').innerText = 'Pridať Nový Návyk';
-      selectedColorHex = COLOR_PALETTE[0].hex;
-      renderColorPicker();
-    }
-
-    function saveHabit() {
-      const name = document.getElementById('habit-input-name').value.trim();
-      const editId = document.getElementById('habit-edit-id').value;
-
-      if (!name) {
-        alert('Zadaj názov návyku.');
-        return;
-      }
-
-      if (editId) {
-        const habit = appState.habits.find(h => h.id === editId);
-        if (habit) {
-          habit.name = name;
-          habit.color = selectedColorHex;
-        }
-      } else {
-        appState.habits.push({
-          id: 'h_' + Date.now(),
-          name: name,
-          color: selectedColorHex
-        });
-      }
-
-      saveState();
-      resetHabitForm();
-      renderHabitsManageList();
-      renderHabitsTab();
-    }
-
-    function editHabit(id) {
-      const habit = appState.habits.find(h => h.id === id);
-      if (!habit) return;
-      document.getElementById('habit-edit-id').value = habit.id;
-      document.getElementById('habit-input-name').value = habit.name;
-      document.getElementById('habit-form-title').innerText = 'Upraviť Návyk';
-      selectedColorHex = habit.color;
-      renderColorPicker();
-    }
-
-    function deleteHabit(id) {
-      if (confirm('Naozaj chceš vymazať tento návyk?')) {
-        appState.habits = appState.habits.filter(h => h.id !== id);
-        saveState();
-        renderHabitsManageList();
-        renderHabitsTab();
-      }
-    }
-
-    function renderHabitsManageList() {
-      const container = document.getElementById('habit-manage-list');
-      container.innerHTML = '';
-      appState.habits.forEach(h => {
-        const item = document.createElement('div');
-        item.className = "flex items-center justify-between p-2.5 bg-slate-800/40 border border-slate-700/50 rounded-xl";
-        item.innerHTML = `
-          <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full" style="background-color: ${h.color}"></div>
-            <span class="font-semibold text-slate-200 text-xs">${h.name}</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <button onclick="editHabit('${h.id}')" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg">
-              <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="deleteHabit('${h.id}')" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-700 rounded-lg">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-      lucide.createIcons();
-    }
-
-    // SETTINGS MODAL (EXERCISES)
+    // SETTINGS MODAL (EXERCISES & INCREMENTS)
     function openSettingsModal() {
       document.getElementById('modal-settings').classList.remove('hidden');
       renderSettingsModal();
@@ -727,34 +386,52 @@
       const containerB = document.getElementById('settings-exercises-b');
       
       containerA.innerHTML = appState.workoutA.map((ex, i) => `
-        <div>
-          <input type="text" id="ex-a-${i}" value="${ex.name}" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+        <div class="p-2.5 bg-slate-800/50 border border-slate-700/60 rounded-xl space-y-2">
+          <div>
+            <label class="block text-slate-400 text-[10px] uppercase font-bold mb-1">Názov cviku</label>
+            <input type="text" id="ex-a-name-${i}" value="${ex.name}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 text-[10px] uppercase font-bold mb-1">Prírastok váhy (+/- kg)</label>
+            <input type="number" step="0.5" id="ex-a-inc-${i}" value="${ex.inc !== undefined ? ex.inc : 2.5}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+          </div>
         </div>
       `).join('');
 
       containerB.innerHTML = appState.workoutB.map((ex, i) => `
-        <div>
-          <input type="text" id="ex-b-${i}" value="${ex.name}" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+        <div class="p-2.5 bg-slate-800/50 border border-slate-700/60 rounded-xl space-y-2">
+          <div>
+            <label class="block text-slate-400 text-[10px] uppercase font-bold mb-1">Názov cviku</label>
+            <input type="text" id="ex-b-name-${i}" value="${ex.name}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 text-[10px] uppercase font-bold mb-1">Prírastok váhy (+/- kg)</label>
+            <input type="number" step="0.5" id="ex-b-inc-${i}" value="${ex.inc !== undefined ? ex.inc : 2.5}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-blue-500">
+          </div>
         </div>
       `).join('');
     }
 
     function saveExerciseSettings() {
       appState.workoutA.forEach((ex, i) => {
-        const val = document.getElementById(`ex-a-${i}`).value.trim();
-        if (val) ex.name = val;
+        const nameVal = document.getElementById(`ex-a-name-${i}`).value.trim();
+        const incVal = parseFloat(document.getElementById(`ex-a-inc-${i}`).value);
+        if (nameVal) ex.name = nameVal;
+        if (!isNaN(incVal) && incVal >= 0) ex.inc = incVal;
       });
       appState.workoutB.forEach((ex, i) => {
-        const val = document.getElementById(`ex-b-${i}`).value.trim();
-        if (val) ex.name = val;
+        const nameVal = document.getElementById(`ex-b-name-${i}`).value.trim();
+        const incVal = parseFloat(document.getElementById(`ex-b-inc-${i}`).value);
+        if (nameVal) ex.name = nameVal;
+        if (!isNaN(incVal) && incVal >= 0) ex.inc = incVal;
       });
       saveState();
       closeSettingsModal();
       renderWorkout();
-      alert('Názvy cvikov boli uložene.');
+      alert('Nastavenia boli uložené.');
     }
 
-    // HISTORY RENDER LOGIC WITH EXPANDABLE DETAILS
+    // HISTORY RENDER LOGIC
     function renderHistory() {
       const container = document.getElementById('history-list');
       container.innerHTML = '';
@@ -772,10 +449,6 @@
         if (item.exercises && Array.isArray(item.exercises)) {
           exercisesListHTML = item.exercises.map(ex => 
             `<div class="text-slate-300 text-xs py-0.5">${ex.name}: <span class="font-semibold text-blue-400">${ex.weight} kg</span> (${ex.logs.join(', ')})</div>`
-          ).join('');
-        } else if (item.details && Array.isArray(item.details)) {
-          exercisesListHTML = item.details.map(d => 
-            `<div class="text-slate-300 text-xs py-0.5">${d}</div>`
           ).join('');
         }
 
@@ -809,6 +482,7 @@
         appState.history.splice(index, 1);
         saveState();
         renderHistory();
+        renderWorkout();
       }
     }
 
@@ -817,7 +491,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `gymtrack_backup_${getTodayStr()}.json`);
+      downloadAnchor.setAttribute("download", `gymtrack_backup_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
