@@ -37,7 +37,6 @@
     .custom-scrollbar::-webkit-scrollbar { display: none; }
     .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Skrytie predvolenej šípky prehliadača pre details */
     summary::-webkit-details-marker { display: none; }
     summary { list-style: none; }
   </style>
@@ -113,7 +112,7 @@
     </section>
   </main>
 
-  <!-- MODAL: SETTINGS (Edit Exercises & Weight Increments) -->
+  <!-- MODAL: SETTINGS -->
   <div id="modal-settings" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center">
@@ -124,16 +123,24 @@
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div class="p-4 overflow-y-auto space-y-6 custom-scrollbar text-xs">
-        <div>
-          <h4 class="font-bold text-blue-400 text-sm mb-3">Tréning A</h4>
-          <div id="settings-exercises-a" class="space-y-3"></div>
-        </div>
-        <div>
-          <h4 class="font-bold text-blue-400 text-sm mb-3">Tréning B</h4>
-          <div id="settings-exercises-b" class="space-y-3"></div>
+
+      <!-- Settings Routine Toggle -->
+      <div class="p-4 pb-0">
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <button onclick="switchSettingsTab('A')" id="btn-settings-tab-a" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all bg-slate-800 text-blue-400 border border-slate-700 shadow">
+            Tréning A
+          </button>
+          <button onclick="switchSettingsTab('B')" id="btn-settings-tab-b" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white">
+            Tréning B
+          </button>
         </div>
       </div>
+
+      <div class="p-4 overflow-y-auto space-y-4 custom-scrollbar text-xs">
+        <div id="settings-exercises-a" class="space-y-3"></div>
+        <div id="settings-exercises-b" class="space-y-3 hidden"></div>
+      </div>
+
       <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex gap-2">
         <button onclick="saveExerciseSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl text-white text-xs shadow">
           Uložiť Nastavenia
@@ -157,7 +164,7 @@
       ],
       workoutB: [
         { id: 'b1', name: 'Leg extension one leg', sets: 2, targetReps: 12, weight: 59, inc: 2.5, logs: [12, 12] },
-        { id: 'b2', name: 'Chest-supported row / T-bar row', sets: 2, targetReps: 10, weight: 60, inc: 2.5, logs: [10, 10] },
+        { id: 'b2', name: 'Chest-supported row / T-bar row', sets: 3, targetReps: 10, weight: 60, inc: 2.5, logs: [10, 10, 10] },
         { id: 'b3', name: 'Smith shoulder press', sets: 2, targetReps: 8, weight: 80, inc: 2.5, logs: [8, 8] },
         { id: 'b4', name: 'Seated leg curl', sets: 2, targetReps: 12, weight: 66, inc: 2.5, logs: [12, 12] },
         { id: 'b5', name: 'Seated good morning', sets: 2, targetReps: 12, weight: 25, inc: 2.5, logs: [12, 12] },
@@ -171,14 +178,14 @@
     let appState = JSON.parse(localStorage.getItem('gymTrackState')) || defaultData;
     if (!appState.history) appState.history = [];
 
-    // Auto-fix/migration for old local data structure
+    // Data structure migration logic
     ['workoutA', 'workoutB'].forEach(key => {
       if (appState[key]) {
         appState[key].forEach(ex => {
           if (ex.inc === undefined) ex.inc = 2.5;
-          if (ex.name.toLowerCase().includes('chest-supported row') && ex.sets === 3) {
-            ex.sets = 2;
-            ex.logs = ex.logs.slice(0, 2);
+          if (ex.name.toLowerCase().includes('chest-supported row')) {
+            ex.sets = 3;
+            while (ex.logs.length < 3) ex.logs.push(ex.targetReps || 10);
           }
           if (ex.name.toLowerCase().includes('lateral raise') && ex.sets === 1) {
             ex.sets = 2;
@@ -189,6 +196,7 @@
     });
 
     let activeRoutine = 'A';
+    let activeSettingsTab = 'A';
 
     function saveState() {
       localStorage.setItem('gymTrackState', JSON.stringify(appState));
@@ -228,7 +236,6 @@
       renderWorkout();
     }
 
-    // Calculate how many times this exercise was performed with current weight in history
     function getWeightOccurrenceCount(exName, currentWeight) {
       let count = 0;
       for (const item of appState.history) {
@@ -238,7 +245,7 @@
           if (found.weight === currentWeight) {
             count++;
           } else {
-            break; // Stop when weight was different
+            break;
           }
         }
       }
@@ -253,7 +260,7 @@
       list.forEach((ex, exIdx) => {
         let isCeilingMet = ex.logs.length >= ex.sets && ex.logs.every(r => r >= ex.targetReps);
         let incVal = ex.inc !== undefined ? ex.inc : 2.5;
-        let nextWeightText = isCeilingMet ? `Cieľ splnený! Prihoď na ${ex.weight + incVal} kg` : `Nechaj ${ex.weight} kg`;
+        let nextWeightText = isCeilingMet ? `Prihoď na ${ex.weight + incVal} kg` : `Nechaj ${ex.weight} kg`;
         
         let weightCount = getWeightOccurrenceCount(ex.name, ex.weight);
 
@@ -261,11 +268,11 @@
         for (let s = 0; s < ex.sets; s++) {
           const currentVal = ex.logs[s] !== undefined ? ex.logs[s] : 0;
           setInputsHTML += `
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs text-slate-400 font-medium">S${s+1}:</span>
-              <button onclick="changeReps('${activeRoutine}', ${exIdx}, ${s}, -1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center text-sm border border-slate-700">-</button>
-              <span class="w-8 text-center text-sm font-bold text-white">${currentVal}</span>
-              <button onclick="changeReps('${activeRoutine}', ${exIdx}, ${s}, 1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center text-sm border border-slate-700">+</button>
+            <div class="flex items-center gap-1 bg-slate-800/50 px-2 py-1 rounded-lg border border-slate-800/80">
+              <span class="text-[11px] text-slate-400 font-semibold">S${s+1}</span>
+              <button onclick="changeReps('${activeRoutine}', ${exIdx}, ${s}, -1)" class="w-5 text-slate-400 hover:text-white font-bold text-sm text-center active:scale-90">-</button>
+              <span class="w-5 text-center text-xs font-extrabold text-white">${currentVal}</span>
+              <button onclick="changeReps('${activeRoutine}', ${exIdx}, ${s}, 1)" class="w-5 text-slate-400 hover:text-white font-bold text-sm text-center active:scale-90">+</button>
             </div>
           `;
         }
@@ -273,39 +280,41 @@
         const card = document.createElement('div');
         card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
         card.innerHTML = `
-          <!-- Name Top, Weight Controls Right -->
+          <!-- Name Top, Frameless Weight Controls Right -->
           <div class="flex items-start justify-between gap-3">
             <div class="space-y-0.5">
               <h3 class="font-bold text-base text-slate-100 leading-snug">${ex.name}</h3>
               <p class="text-xs text-slate-400 font-medium">Cieľ: ${ex.targetReps}${ex.name.toLowerCase().includes('back extension') ? 's' : ' op.'}</p>
             </div>
             
-            <!-- Weight Controls with Editable Input -->
-            <div class="shrink-0 flex items-center gap-1">
-              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, -1)" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700">-</button>
-              <div class="flex items-center gap-0.5">
-                <input type="number" step="any" value="${ex.weight}" onchange="updateWeightDirect('${activeRoutine}', ${exIdx}, this.value)" class="w-14 bg-slate-800 text-center font-extrabold text-blue-400 border border-slate-700 rounded-lg py-1 text-sm focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+            <!-- Seamless Weight Controls -->
+            <div class="shrink-0 flex items-center gap-0.5 pt-0.5">
+              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, -1)" class="w-6 h-6 text-slate-400 hover:text-white font-black text-base flex items-center justify-center active:scale-90">-</button>
+              <div class="flex items-center">
+                <input type="number" step="any" value="${ex.weight}" onchange="updateWeightDirect('${activeRoutine}', ${exIdx}, this.value)" class="w-12 bg-transparent text-center font-black text-blue-400 text-base focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                 <span class="text-xs text-slate-400 font-bold">kg</span>
               </div>
-              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, 1)" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700">+</button>
+              <button onclick="changeWeight('${activeRoutine}', ${exIdx}, 1)" class="w-6 h-6 text-slate-400 hover:text-white font-black text-base flex items-center justify-center active:scale-90">+</button>
             </div>
           </div>
 
-          <!-- Series Reps Row -->
-          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
+          <!-- Series Reps Container (Flex Wrapped for neat look even with 3 sets) -->
+          <div class="flex flex-wrap items-center justify-start gap-2 pt-1 border-t border-slate-800/80">
             ${setInputsHTML}
           </div>
 
-          <!-- Bottom Status Row: Left Counter, Right Recommendation -->
+          <!-- Bottom Status Row: Left Recommendation, Right Simplified Counter -->
           <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between gap-2 text-[11px]">
-            <div class="flex items-center gap-1.5 text-slate-400 bg-slate-800/40 px-2 py-1 rounded-lg border border-slate-700/40">
-              <i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i>
-              <span>Odcvičené: <strong class="text-slate-200 font-bold">${weightCount}x</strong></span>
-            </div>
-
+            <!-- Left: Recommendation -->
             <div class="flex items-center gap-1.5 ${isCeilingMet ? 'text-emerald-400 bg-emerald-950/40 border border-emerald-800/40' : 'text-slate-400 bg-slate-800/30'} px-2 py-1 rounded-lg">
               <i data-lucide="${isCeilingMet ? 'trending-up' : 'minus'}" class="w-3.5 h-3.5 shrink-0"></i>
               <span>${nextWeightText}</span>
+            </div>
+
+            <!-- Right: Minimal Counter -->
+            <div class="flex items-center gap-1 text-slate-400 bg-slate-800/40 px-2 py-1 rounded-lg border border-slate-700/40">
+              <i data-lucide="repeat" class="w-3.5 h-3.5 text-blue-400"></i>
+              <strong class="text-slate-200 font-bold">${weightCount}x</strong>
             </div>
           </div>
         `;
@@ -371,14 +380,35 @@
       renderHistory();
     }
 
-    // SETTINGS MODAL (EXERCISES & INCREMENTS)
+    // SETTINGS MODAL & TABS
     function openSettingsModal() {
       document.getElementById('modal-settings').classList.remove('hidden');
       renderSettingsModal();
+      switchSettingsTab(activeSettingsTab);
     }
 
     function closeSettingsModal() {
       document.getElementById('modal-settings').classList.add('hidden');
+    }
+
+    function switchSettingsTab(tab) {
+      activeSettingsTab = tab;
+      const btnA = document.getElementById('btn-settings-tab-a');
+      const btnB = document.getElementById('btn-settings-tab-b');
+      const containerA = document.getElementById('settings-exercises-a');
+      const containerB = document.getElementById('settings-exercises-b');
+
+      if (tab === 'A') {
+        btnA.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all bg-slate-800 text-blue-400 border border-slate-700 shadow";
+        btnB.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white";
+        containerA.classList.remove('hidden');
+        containerB.classList.add('hidden');
+      } else {
+        btnB.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all bg-slate-800 text-blue-400 border border-slate-700 shadow";
+        btnA.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-white";
+        containerB.classList.remove('hidden');
+        containerA.classList.add('hidden');
+      }
     }
 
     function renderSettingsModal() {
