@@ -527,9 +527,14 @@
                 <span class="text-xs text-slate-400 font-medium">${item.date}</span>
                 <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"></i>
               </div>
-              <button onclick="deleteHistoryItem(event, ${index})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Vymazať z histórie">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
+              <div class="flex items-center gap-1">
+                <button onclick="editHistoryDate(event, ${index})" class="text-slate-500 hover:text-blue-400 p-1 transition" title="Upraviť dátum">
+                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteHistoryItem(event, ${index})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Vymazať z histórie">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
             </summary>
             <div class="px-3 pb-3 pt-2 border-t border-slate-700/40 space-y-1 bg-slate-900/40">
               ${exercisesListHTML}
@@ -540,6 +545,18 @@
       });
 
       lucide.createIcons();
+    }
+
+    function editHistoryDate(e, index) {
+      e.stopPropagation();
+      e.preventDefault();
+      const currentDate = appState.history[index].date;
+      const newDate = prompt('Zadaj nový dátum tréningu:', currentDate);
+      if (newDate && newDate.trim() !== '') {
+        appState.history[index].date = newDate.trim();
+        saveState();
+        renderHistory();
+      }
     }
 
     function deleteHistoryItem(e, index) {
